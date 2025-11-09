@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auraflix - Discover Movies</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Custom Styles -->
+    <style>
+        /* For Webkit browsers (Chrome, Safari) */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* For Firefox */
+        .no-scrollbar {
+            scrollbar-width: none;
+        }
+        /* For IE, Edge */
+        .no-scrollbar {
+            -ms-overflow-style: none;
+        }
+        .active-nav {
+            color: #2563eb; /* blue-600 */
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white font-sans">
+
+    <div id="app" class="pb-24">
+        <!-- ===== Page Containers ===== -->
+
+        <!-- Home Page -->
+        <div id="homePage" class="page">
+            <header class="p-4">
+                <h1 class="text-3xl font-bold text-blue-500">Auraflix</h1>
+            </header>
+            <main>
+                <!-- Banner Carousel -->
+                <section id="bannerCarousel" class="relative w-full h-48 md:h-64 overflow-hidden mb-8">
+                    <!-- Banners will be injected here -->
+                </section>
+
+                <!-- Movie Carousels by Category -->
+                <div id="movieCarousels" class="space-y-8 px-4">
+                    <!-- Category sections will be injected here -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Movie Details Page -->
+        <div id="detailsPage" class="page hidden p-4">
+            <button id="backButton" class="mb-4 text-blue-500"><i class="fas fa-arrow-left"></i> Back</button>
+            <div id="movieDetailsContent" class="flex flex-col md:flex-row gap-8">
+                <!-- Movie details will be injected here -->
+            </div>
+        </div>
+
+        <!-- Search Page -->
+        <div id="searchPage" class="page hidden p-4">
+            <h2 class="text-2xl font-bold mb-4">Search</h2>
+            <input type="text" id="searchInput" class="w-full bg-slate-800 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" placeholder="Search for a movie...">
+            <div id="searchResults" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
+                <!-- Search results will appear here -->
+            </div>
+        </div>
+
+        <!-- Categories Page -->
+        <div id="categoriesPage" class="page hidden p-4">
+            <h2 class="text-2xl font-bold mb-4">Categories</h2>
+            <div id="categoriesGrid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <!-- Categories will be injected here -->
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profilePage" class="page hidden p-4 flex flex-col items-center justify-center min-h-[calc(100vh-6rem)]">
+            <!-- Logged Out View -->
+            <div id="authFormContainer">
+                <div id="loginView">
+                    <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+                    <form id="loginForm" class="w-full max-w-sm space-y-4">
+                        <input type="email" id="loginEmail" placeholder="Email" class="w-full bg-slate-800 p-3 rounded-lg" required>
+                        <input type="password" id="loginPassword" placeholder="Password" class="w-full bg-slate-800 p-3 rounded-lg" required>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-semibold">Login</button>
+                        <p class="text-center text-slate-400">Don't have an account? <a href="#" id="showSignUp" class="text-blue-500">Sign Up</a></p>
+                    </form>
+                </div>
+                <div id="signupView" class="hidden">
+                    <h2 class="text-2xl font-bold mb-6 text-center">Sign Up</h2>
+                    <form id="signupForm" class="w-full max-w-sm space-y-4">
+                        <input type="email" id="signupEmail" placeholder="Email" class="w-full bg-slate-800 p-3 rounded-lg" required>
+                        <input type="password" id="signupPassword" placeholder="Password" class="w-full bg-slate-800 p-3 rounded-lg" required>
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-semibold">Sign Up</button>
+                        <p class="text-center text-slate-400">Already have an account? <a href="#" id="showLogin" class="text-blue-500">Login</a></p>
+                    </form>
+                </div>
+                 <p id="authError" class="text-red-500 mt-4 text-center"></p>
+            </div>
+
+            <!-- Logged In View -->
+            <div id="loggedInContainer" class="hidden text-center">
+                <h2 class="text-2xl font-bold mb-4">Profile</h2>
+                <p class="mb-4">Logged in as: <span id="userEmail" class="font-semibold"></span></p>
+                <button id="logoutButton" class="bg-red-600 hover:bg-red-700 p-3 rounded-lg font-semibold">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 h-20 bg-slate-900/80 backdrop-blur-md shadow-[0_-1px_10px_rgba(0,0,0,0.2)]">
+        <div class="flex justify-around items-center h-full max-w-lg mx-auto">
+            <button data-page="homePage" class="nav-item flex flex-col items-center gap-1 text-slate-400 active-nav">
+                <i class="fas fa-home text-xl"></i>
+                <span class="text-xs">Home</span>
+            </button>
+            <button data-page="searchPage" class="nav-item flex flex-col items-center gap-1 text-slate-400">
+                <i class="fas fa-search text-xl"></i>
+                <span class="text-xs">Search</span>
+            </button>
+            <button data-page="categoriesPage" class="nav-item flex flex-col items-center gap-1 text-slate-400">
+                <i class="fas fa-th-large text-xl"></i>
+                <span class="text-xs">Categories</span>
+            </button>
+            <button data-page="profilePage" class="nav-item flex flex-col items-center gap-1 text-slate-400">
+                <i class="fas fa-user text-xl"></i>
+                <span class="text-xs">Profile</span>
+            </button>
+        </div>
+    </nav>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+    <script>
+        // IMPORTANT: Paste your Firebase configuration object here
+const firebaseConfig = {
+  apiKey: "AIzaSyA-OFySy038bfPKVJ89wgaKXe5YeFqJVI8",
+  authDomain: "auraflix-3ddec.firebaseapp.com",
+  databaseURL: "https://auraflix-3ddec-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "auraflix-3ddec",
+  storageBucket: "auraflix-3ddec.firebasestorage.app",
+  messagingSenderId: "190953622857",
+  appId: "1:190953622857:web:b0b3eedc8ad1f9578e5e98"
+};
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // --- APP STATE ---
+        let movies = [];
+        let categories = [];
+
+        // --- DOM ELEMENTS ---
+        const pages = document.querySelectorAll('.page');
+        const navItems = document.querySelectorAll('.nav-item');
+        const bannerCarousel = document.getElementById('bannerCarousel');
+        const movieCarouselsContainer = document.getElementById('movieCarousels');
+        const searchInput = document.getElementById('searchInput');
+        const searchResultsContainer = document.getElementById('searchResults');
+        const categoriesGrid = document.getElementById('categoriesGrid');
+        const backButton = document.getElementById('backButton');
+        const movieDetailsContent = document.getElementById('movieDetailsContent');
+
+        // --- NAVIGATION LOGIC ---
+        const navigateTo = (pageId) => {
+            pages.forEach(page => page.classList.toggle('hidden', page.id !== pageId));
+            navItems.forEach(item => {
+                item.classList.toggle('active-nav', item.dataset.page === pageId);
+                item.classList.toggle('text-slate-400', item.dataset.page !== pageId);
+            });
+            window.scrollTo(0, 0);
+        };
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', () => navigateTo(item.dataset.page));
+        });
+
+        // --- DATA FETCHING AND RENDERING ---
+        
+        // Fetch All Data on Load
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchBanners();
+            fetchCategories();
+            fetchMovies();
+            setupAuthObserver();
+        });
+
+        const fetchBanners = () => {
+            db.ref('banners').on('value', snapshot => {
+                const banners = snapshot.val() || {};
+                renderBanners(Object.values(banners));
+            });
+        };
+
+        const fetchCategories = () => {
+            db.ref('categories').on('value', snapshot => {
+                const cats = snapshot.val() || {};
+                categories = Object.entries(cats).map(([key, value]) => ({ id: key, ...value }));
+                renderCategoriesPage();
+            });
+        };
+
+        const fetchMovies = () => {
+            db.ref('movies').on('value', snapshot => {
+                const movs = snapshot.val() || {};
+                movies = Object.entries(movs).map(([key, value]) => ({ id: key, ...value }));
+                renderHomePageCarousels();
+                renderSearchResults(movies); // Initially show all movies
+            });
+        };
+
+        const renderBanners = (bannerData) => {
+            if (!bannerData || bannerData.length === 0) return;
+            bannerCarousel.innerHTML = bannerData.map(banner => {
+                // Defensive check for URL
+                if (!banner.imageUrl || typeof banner.imageUrl !== 'string') return '';
+                return `<img src="${banner.imageUrl}" class="absolute w-full h-full object-cover transition-opacity duration-1000" style="opacity: 0;">`
+            }).join('');
+            
+            let currentBanner = 0;
+            const bannerImages = bannerCarousel.querySelectorAll('img');
+            if(bannerImages.length > 0) {
+                bannerImages[0].style.opacity = 1;
+                setInterval(() => {
+                    bannerImages[currentBanner].style.opacity = 0;
+                    currentBanner = (currentBanner + 1) % bannerImages.length;
+                    bannerImages[currentBanner].style.opacity = 1;
+                }, 4000);
+            }
+        };
+
+        const renderHomePageCarousels = () => {
+            movieCarouselsContainer.innerHTML = categories.map(category => {
+                // Defensive check for category name
+                if (!category.name) return '';
+                const categoryMovies = movies.filter(movie => movie.category === category.name);
+                if (categoryMovies.length === 0) return '';
+                
+                return `
+                    <section>
+                        <h2 class="text-xl font-bold mb-3">${category.name}</h2>
+                        <div class="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
+                            ${categoryMovies.map(movie => {
+                                // Defensive checks
+                                if (!movie.id || !movie.posterUrl) return '';
+                                return `
+                                    <div class="flex-shrink-0 w-36 cursor-pointer" onclick="showMovieDetails('${movie.id}')">
+                                        <img src="${movie.posterUrl}" alt="${movie.title}" class="w-full h-52 object-cover rounded-lg">
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </section>
+                `;
+            }).join('');
+        };
+        
+        const renderCategoriesPage = () => {
+             const colors = ['bg-blue-600', 'bg-red-600', 'bg-green-600', 'bg-yellow-600', 'bg-indigo-600', 'bg-purple-600'];
+             categoriesGrid.innerHTML = categories.map((cat, index) => {
+                // Defensive check
+                if (!cat.name) return '';
+                return `
+                <div class="${colors[index % colors.length]} h-28 rounded-lg flex items-center justify-center text-lg font-bold">
+                    <i class="fas fa-film mr-2"></i> ${cat.name}
+                </div>`;
+             }).join('');
+        };
+
+        // --- MOVIE DETAILS LOGIC ---
+        const showMovieDetails = (movieId) => {
+            // Defensive check for movieId
+            if (!movieId) {
+                console.error("Movie ID is null or undefined.");
+                return;
+            }
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) {
+                console.error(`Movie with ID ${movieId} not found.`);
+                return;
+            }
+            
+            movieDetailsContent.innerHTML = `
+                <div class="flex-shrink-0 w-48 mx-auto md:mx-0">
+                    <img src="${movie.posterUrl || ''}" alt="${movie.title || 'No Title'}" class="w-full h-auto object-cover rounded-lg">
+                </div>
+                <div class="flex-grow">
+                    <h2 class="text-3xl font-bold">${movie.title || 'No Title'}</h2>
+                    <div class="flex items-center gap-4 text-slate-400 my-2">
+                        <span>⭐ ${movie.rating || 'N/A'}</span>
+                        <span>${movie.year || 'N/A'}</span>
+                    </div>
+                    <p class="my-4 text-slate-300">${movie.description || 'No description available.'}</p>
+                    <p class="text-slate-400 mb-4"><strong>Cast:</strong> ${movie.cast || 'N/A'}</p>
+                    <a href="${movie.watchLink || '#'}" target="_blank" class="inline-block w-full text-center bg-blue-600 hover:bg-blue-700 p-3 rounded-lg font-semibold">
+                        <i class="fas fa-play mr-2"></i> Watch Now
+                    </a>
+                </div>
+            `;
+            navigateTo('detailsPage');
+        };
+
+        backButton.addEventListener('click', () => navigateTo('homePage'));
+
+        // --- SEARCH LOGIC ---
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filteredMovies = movies.filter(movie => 
+                movie.title && movie.title.toLowerCase().includes(searchTerm)
+            );
+            renderSearchResults(filteredMovies);
+        });
+        
+        const renderSearchResults = (results) => {
+            if (results.length === 0) {
+                searchResultsContainer.innerHTML = `<p class="col-span-full text-center text-slate-400">No movies found.</p>`;
+                return;
+            }
+            searchResultsContainer.innerHTML = results.map(movie => {
+                // Defensive checks
+                if (!movie.id || !movie.posterUrl || !movie.title) return '';
+                return `
+                    <div class="cursor-pointer" onclick="showMovieDetails('${movie.id}')">
+                        <img src="${movie.posterUrl}" alt="${movie.title}" class="w-full h-auto object-cover rounded-lg aspect-[2/3]">
+                        <p class="mt-2 text-sm truncate">${movie.title}</p>
+                    </div>
+                `;
+            }).join('');
+        };
+        
+        // --- AUTHENTICATION LOGIC ---
+        const authFormContainer = document.getElementById('authFormContainer');
+        const loggedInContainer = document.getElementById('loggedInContainer');
+        const loginView = document.getElementById('loginView');
+        const signupView = document.getElementById('signupView');
+        const authError = document.getElementById('authError');
+
+        document.getElementById('showSignUp').addEventListener('click', (e) => {
+            e.preventDefault();
+            loginView.classList.add('hidden');
+            signupView.classList.remove('hidden');
+            authError.textContent = '';
+        });
+
+        document.getElementById('showLogin').addEventListener('click', (e) => {
+            e.preventDefault();
+            signupView.classList.add('hidden');
+            loginView.classList.remove('hidden');
+            authError.textContent = '';
+        });
+
+        // Sign Up
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            auth.createUserWithEmailAndPassword(email, password)
+                .catch(error => { authError.textContent = error.message; });
+        });
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => { authError.textContent = error.message; });
+        });
+
+        // Logout
+        document.getElementById('logoutButton').addEventListener('click', () => {
+            auth.signOut();
+        });
+        
+        // Auth State Observer
+        const setupAuthObserver = () => {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // User is signed in
+                    document.getElementById('userEmail').textContent = user.email;
+                    authFormContainer.classList.add('hidden');
+                    loggedInContainer.classList.remove('hidden');
+                } else {
+                    // User is signed out
+                    authFormContainer.classList.remove('hidden');
+                    loggedInContainer.classList.add('hidden');
+                    authError.textContent = '';
+                }
+            });
+        };
+        
+        // Set default page
+        navigateTo('homePage');
+
+    </script>
+</body>
+</html>
