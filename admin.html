@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auraflix Admin Panel</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-white font-sans">
+
+    <!-- Login Page -->
+    <div id="loginPage" class="flex items-center justify-center min-h-screen">
+        <div class="w-full max-w-md p-8 space-y-6 bg-slate-800 rounded-xl shadow-lg">
+            <h1 class="text-3xl font-bold text-center text-blue-500">Auraflix Admin</h1>
+            <form id="adminLoginForm">
+                <div>
+                    <label for="adminEmail" class="text-sm font-bold text-gray-300 block">Email</label>
+                    <input type="email" id="adminEmail" class="w-full p-2 mt-1 text-gray-300 bg-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+                </div>
+                <div>
+                    <label for="adminPassword" class="text-sm font-bold text-gray-300 block mt-4">Password</label>
+                    <input type="password" id="adminPassword" class="w-full p-2 mt-1 text-gray-300 bg-slate-700 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600" required>
+                </div>
+                <button type="submit" class="w-full py-2 px-4 mt-6 bg-blue-600 hover:bg-blue-700 rounded-md font-semibold text-white">Login</button>
+                <p id="adminLoginError" class="text-red-500 mt-4 text-center"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div id="adminPanel" class="hidden">
+        <div class="flex h-screen">
+            <!-- Sidebar -->
+            <aside class="w-64 bg-slate-800 p-6 flex-shrink-0">
+                <h1 class="text-2xl font-bold text-blue-500 mb-8">Admin Panel</h1>
+                <nav class="space-y-4">
+                    <button data-page="dashboardPage" class="admin-nav-item w-full text-left flex items-center gap-3 p-2 rounded-md hover:bg-slate-700 text-blue-500">
+                        <i class="fas fa-tachometer-alt"></i> Dashboard
+                    </button>
+                    <button data-page="moviesPage" class="admin-nav-item w-full text-left flex items-center gap-3 p-2 rounded-md hover:bg-slate-700">
+                        <i class="fas fa-film"></i> Movies
+                    </button>
+                    <button data-page="categoriesPage" class="admin-nav-item w-full text-left flex items-center gap-3 p-2 rounded-md hover:bg-slate-700">
+                        <i class="fas fa-th-list"></i> Categories
+                    </button>
+                    <button data-page="bannersPage" class="admin-nav-item w-full text-left flex items-center gap-3 p-2 rounded-md hover:bg-slate-700">
+                        <i class="fas fa-images"></i> Banners
+                    </button>
+                </nav>
+                 <button id="adminLogoutButton" class="w-full text-left flex items-center gap-3 p-2 rounded-md hover:bg-slate-700 mt-10 text-red-500">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-grow p-8 overflow-y-auto">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="admin-page">
+                    <h2 class="text-3xl font-bold mb-6">Dashboard</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-slate-800 p-6 rounded-xl"><h3 class="text-lg text-slate-400">Total Movies</h3><p id="totalMovies" class="text-4xl font-bold">0</p></div>
+                        <div class="bg-slate-800 p-6 rounded-xl"><h3 class="text-lg text-slate-400">Total Categories</h3><p id="totalCategories" class="text-4xl font-bold">0</p></div>
+                        <div class="bg-slate-800 p-6 rounded-xl"><h3 class="text-lg text-slate-400">Total Banners</h3><p id="totalBanners" class="text-4xl font-bold">0</p></div>
+                    </div>
+                </div>
+                
+                <!-- Movies Page -->
+                <div id="moviesPage" class="admin-page hidden">
+                     <h2 class="text-3xl font-bold mb-6">Manage Movies</h2>
+                     <!-- Add/Edit Form -->
+                     <form id="movieForm" class="bg-slate-800 p-6 rounded-lg mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <input type="hidden" id="movieId">
+                         <div>
+                             <label for="movieTitle" class="block text-sm font-medium text-slate-300">Title</label>
+                             <input type="text" id="movieTitle" class="mt-1 block w-full bg-slate-700 rounded-md p-2" required>
+                         </div>
+                         <div>
+                             <label for="movieYear" class="block text-sm font-medium text-slate-300">Year</label>
+                             <input type="number" id="movieYear" class="mt-1 block w-full bg-slate-700 rounded-md p-2" required>
+                         </div>
+                         <div class="md:col-span-2">
+                            <label for="moviePosterUrl" class="block text-sm font-medium text-slate-300">Poster URL</label>
+                            <input type="url" id="moviePosterUrl" placeholder="https://..." class="mt-1 block w-full bg-slate-700 rounded-md p-2" required>
+                         </div>
+                         <div class="md:col-span-2">
+                             <label for="movieWatchLink" class="block text-sm font-medium text-slate-300">Watch Link URL</label>
+                             <input type="url" id="movieWatchLink" placeholder="https://..." class="mt-1 block w-full bg-slate-700 rounded-md p-2" required>
+                         </div>
+                         <div>
+                             <label for="movieRating" class="block text-sm font-medium text-slate-300">Rating</label>
+                             <input type="number" step="0.1" id="movieRating" class="mt-1 block w-full bg-slate-700 rounded-md p-2" required>
+                         </div>
+                         <div>
+                             <label for="movieCategory" class="block text-sm font-medium text-slate-300">Category</label>
+                             <select id="movieCategory" class="mt-1 block w-full bg-slate-700 rounded-md p-2" required></select>
+                         </div>
+                         <div class="md:col-span-2">
+                             <label for="movieCast" class="block text-sm font-medium text-slate-300">Cast (comma-separated)</label>
+                             <input type="text" id="movieCast" class="mt-1 block w-full bg-slate-700 rounded-md p-2">
+                         </div>
+                         <div class="md:col-span-2">
+                             <label for="movieDescription" class="block text-sm font-medium text-slate-300">Description</label>
+                             <textarea id="movieDescription" rows="3" class="mt-1 block w-full bg-slate-700 rounded-md p-2"></textarea>
+                         </div>
+                         <div class="md:col-span-2 flex items-center gap-4">
+                            <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md font-semibold">Save Movie</button>
+                            <button type="button" id="clearMovieForm" class="bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-md font-semibold">Clear</button>
+                         </div>
+                     </form>
+                     <!-- Movies Table -->
+                     <div class="bg-slate-800 rounded-lg overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-700">
+                                <tr>
+                                    <th class="p-3">Title</th><th class="p-3">Category</th><th class="p-3">Year</th><th class="p-3">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="moviesTableBody"></tbody>
+                        </table>
+                     </div>
+                </div>
+
+                <!-- Categories Page -->
+                <div id="categoriesPage" class="admin-page hidden">
+                    <h2 class="text-3xl font-bold mb-6">Manage Categories</h2>
+                     <form id="categoryForm" class="bg-slate-800 p-6 rounded-lg mb-8 flex gap-4">
+                         <input type="hidden" id="categoryId">
+                         <input type="text" id="categoryName" placeholder="Category Name" class="flex-grow bg-slate-700 rounded-md p-2" required>
+                         <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md font-semibold">Save Category</button>
+                         <button type="button" id="clearCategoryForm" class="bg-slate-600 hover:bg-slate-500 px-4 py-2 rounded-md font-semibold">Clear</button>
+                     </form>
+                     <div class="bg-slate-800 rounded-lg overflow-hidden">
+                         <table class="w-full text-left">
+                             <thead class="bg-slate-700"><tr><th class="p-3">Name</th><th class="p-3">Actions</th></tr></thead>
+                             <tbody id="categoriesTableBody"></tbody>
+                         </table>
+                     </div>
+                </div>
+
+                <!-- Banners Page -->
+                <div id="bannersPage" class="admin-page hidden">
+                    <h2 class="text-3xl font-bold mb-6">Manage Banners</h2>
+                    <form id="bannerForm" class="bg-slate-800 p-6 rounded-lg mb-8 flex gap-4">
+                        <input type="hidden" id="bannerId">
+                        <input type="url" id="bannerImageUrl" placeholder="https://... Image URL" class="flex-grow bg-slate-700 rounded-md p-2" required>
+                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-md font-semibold">Save Banner</button>
+                    </form>
+                    <div class="bg-slate-800 rounded-lg overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-slate-700"><tr><th class="p-3">Image URL</th><th class="p-3">Preview</th><th class="p-3">Actions</th></tr></thead>
+                            <tbody id="bannersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    
+    <script>
+        // IMPORTANT: Paste your Firebase configuration object here
+const firebaseConfig = {
+  apiKey: "AIzaSyA-OFySy038bfPKVJ89wgaKXe5YeFqJVI8",
+  authDomain: "auraflix-3ddec.firebaseapp.com",
+  databaseURL: "https://auraflix-3ddec-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "auraflix-3ddec",
+  storageBucket: "auraflix-3ddec.firebasestorage.app",
+  messagingSenderId: "190953622857",
+  appId: "1:190953622857:web:b0b3eedc8ad1f9578e5e98"
+};
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.database();
+
+        // --- DOM Elements ---
+        const loginPage = document.getElementById('loginPage');
+        const adminPanel = document.getElementById('adminPanel');
+        const adminPages = document.querySelectorAll('.admin-page');
+        const adminNavItems = document.querySelectorAll('.admin-nav-item');
+
+        // --- AUTH LOGIC ---
+        document.getElementById('adminLoginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .catch(error => { document.getElementById('adminLoginError').textContent = error.message; });
+        });
+
+        document.getElementById('adminLogoutButton').addEventListener('click', () => auth.signOut());
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                loginPage.classList.add('hidden');
+                adminPanel.classList.remove('hidden');
+                initAdminPanel();
+            } else {
+                loginPage.classList.remove('hidden');
+                adminPanel.classList.add('hidden');
+            }
+        });
+
+        // --- ADMIN PANEL NAVIGATION ---
+        const navigateAdminTo = (pageId) => {
+            adminPages.forEach(page => page.classList.toggle('hidden', page.id !== pageId));
+            adminNavItems.forEach(item => {
+                item.classList.toggle('text-blue-500', item.dataset.page === pageId);
+            });
+        };
+        adminNavItems.forEach(item => {
+            item.addEventListener('click', () => navigateAdminTo(item.dataset.page));
+        });
+
+        // --- ADMIN PANEL INITIALIZATION ---
+        const initAdminPanel = () => {
+            loadDashboardStats();
+            loadCategories();
+            loadBanners();
+            loadMovies();
+            setupFormListeners();
+        };
+
+        const loadDashboardStats = () => {
+            db.ref('movies').on('value', snap => { document.getElementById('totalMovies').textContent = snap.numChildren(); });
+            db.ref('categories').on('value', snap => { document.getElementById('totalCategories').textContent = snap.numChildren(); });
+            db.ref('banners').on('value', snap => { document.getElementById('totalBanners').textContent = snap.numChildren(); });
+        };
+        
+        // --- FORM LISTENERS ---
+        const setupFormListeners = () => {
+            // Movies
+            document.getElementById('movieForm').addEventListener('submit', handleMovieSubmit);
+            document.getElementById('clearMovieForm').addEventListener('click', clearMovieForm);
+            // Categories
+            document.getElementById('categoryForm').addEventListener('submit', handleCategorySubmit);
+            document.getElementById('clearCategoryForm').addEventListener('click', clearCategoryForm);
+            // Banners
+            document.getElementById('bannerForm').addEventListener('submit', handleBannerSubmit);
+        };
+
+        // --- CATEGORIES CRUD ---
+        const categoriesTableBody = document.getElementById('categoriesTableBody');
+        let categoriesData = {}; // To store categories for movie dropdown
+
+        const loadCategories = () => {
+            db.ref('categories').on('value', snapshot => {
+                categoriesData = snapshot.val() || {};
+                categoriesTableBody.innerHTML = '';
+                const movieCategoryDropdown = document.getElementById('movieCategory');
+                movieCategoryDropdown.innerHTML = '<option value="">Select Category</option>';
+
+                for (const key in categoriesData) {
+                    const category = categoriesData[key];
+                    // Defensive check
+                    if (!category || typeof category.name !== 'string') continue;
+                    
+                    // Populate Table
+                    const row = `
+                        <tr>
+                            <td class="p-3">${category.name}</td>
+                            <td class="p-3">
+                                <button onclick="editCategory('${key}')" class="text-yellow-500 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('categories', '${key}')" class="text-red-500"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                    categoriesTableBody.innerHTML += row;
+
+                    // Populate Dropdown
+                    const option = document.createElement('option');
+                    option.value = category.name;
+                    option.textContent = category.name;
+                    movieCategoryDropdown.appendChild(option);
+                }
+            });
+        };
+        
+        const handleCategorySubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('categoryId').value;
+            const name = document.getElementById('categoryName').value;
+            // Defensive check
+            if (!name) { alert('Category name cannot be empty.'); return; }
+            
+            const data = { name };
+            const ref = id ? db.ref('categories/' + id) : db.ref('categories').push();
+            ref.set(data).then(() => clearCategoryForm()).catch(alert);
+        };
+        
+        window.editCategory = (id) => {
+            // Defensive check
+            if (!id || !categoriesData[id]) return;
+            document.getElementById('categoryId').value = id;
+            document.getElementById('categoryName').value = categoriesData[id].name;
+        };
+        
+        const clearCategoryForm = () => {
+            document.getElementById('categoryId').value = '';
+            document.getElementById('categoryForm').reset();
+        };
+
+        // --- BANNERS CRUD ---
+        const bannersTableBody = document.getElementById('bannersTableBody');
+        
+        const loadBanners = () => {
+            db.ref('banners').on('value', snapshot => {
+                const banners = snapshot.val() || {};
+                bannersTableBody.innerHTML = '';
+                for (const key in banners) {
+                    const banner = banners[key];
+                    // Defensive check
+                    if (!banner || typeof banner.imageUrl !== 'string') continue;
+
+                    bannersTableBody.innerHTML += `
+                        <tr>
+                            <td class="p-3 truncate max-w-xs">${banner.imageUrl}</td>
+                            <td class="p-3"><img src="${banner.imageUrl}" class="h-10 w-20 object-cover rounded"></td>
+                            <td class="p-3">
+                                <button onclick="deleteItem('banners', '${key}')" class="text-red-500"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                }
+            });
+        };
+
+        const handleBannerSubmit = (e) => {
+            e.preventDefault();
+            const imageUrl = document.getElementById('bannerImageUrl').value;
+            // Defensive check
+            if (!imageUrl) { alert('Banner URL cannot be empty.'); return; }
+
+            db.ref('banners').push({ imageUrl })
+              .then(() => document.getElementById('bannerForm').reset())
+              .catch(alert);
+        };
+
+        // --- MOVIES CRUD ---
+        const moviesTableBody = document.getElementById('moviesTableBody');
+        let moviesData = {};
+
+        const loadMovies = () => {
+            db.ref('movies').on('value', snapshot => {
+                moviesData = snapshot.val() || {};
+                moviesTableBody.innerHTML = '';
+                for (const key in moviesData) {
+                    const movie = moviesData[key];
+                    // Defensive check
+                    if (!movie || !movie.title) continue;
+
+                    moviesTableBody.innerHTML += `
+                        <tr>
+                            <td class="p-3">${movie.title}</td>
+                            <td class="p-3">${movie.category || 'N/A'}</td>
+                            <td class="p-3">${movie.year || 'N/A'}</td>
+                            <td class="p-3">
+                                <button onclick="editMovie('${key}')" class="text-yellow-500 mr-4"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('movies', '${key}')" class="text-red-500"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>`;
+                }
+            });
+        };
+        
+        const handleMovieSubmit = (e) => {
+            e.preventDefault();
+            const id = document.getElementById('movieId').value;
+            const data = {
+                title: document.getElementById('movieTitle').value,
+                year: document.getElementById('movieYear').value,
+                posterUrl: document.getElementById('moviePosterUrl').value,
+                watchLink: document.getElementById('movieWatchLink').value,
+                rating: document.getElementById('movieRating').value,
+                category: document.getElementById('movieCategory').value,
+                cast: document.getElementById('movieCast').value,
+                description: document.getElementById('movieDescription').value,
+            };
+            
+            // Defensive checks
+            if (!data.title || !data.posterUrl || !data.watchLink) {
+                alert('Title, Poster URL, and Watch Link are required.');
+                return;
+            }
+
+            const ref = id ? db.ref('movies/' + id) : db.ref('movies').push();
+            ref.set(data).then(() => clearMovieForm()).catch(alert);
+        };
+        
+        window.editMovie = (id) => {
+            // Defensive check
+            if (!id || !moviesData[id]) return;
+            const movie = moviesData[id];
+            document.getElementById('movieId').value = id;
+            document.getElementById('movieTitle').value = movie.title || '';
+            document.getElementById('movieYear').value = movie.year || '';
+            document.getElementById('moviePosterUrl').value = movie.posterUrl || '';
+            document.getElementById('movieWatchLink').value = movie.watchLink || '';
+            document.getElementById('movieRating').value = movie.rating || '';
+            document.getElementById('movieCategory').value = movie.category || '';
+            document.getElementById('movieCast').value = movie.cast || '';
+            document.getElementById('movieDescription').value = movie.description || '';
+        };
+
+        const clearMovieForm = () => {
+            document.getElementById('movieId').value = '';
+            document.getElementById('movieForm').reset();
+        };
+
+        // --- GENERIC DELETE FUNCTION ---
+        window.deleteItem = (path, id) => {
+            // Defensive check
+            if (!path || !id) {
+                console.error("Path or ID is missing for delete operation.");
+                return;
+            }
+            if (confirm(`Are you sure you want to delete this item?`)) {
+                db.ref(path + '/' + id).remove().catch(alert);
+            }
+        };
+
+    </script>
+</body>
+</html>
